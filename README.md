@@ -1,2 +1,2 @@
 # star-sweep
-A smart literatures analysis/review platform
+A smart biomedical literatures analysis/review platform
