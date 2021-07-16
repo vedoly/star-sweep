@@ -1,0 +1,6 @@
+streamlit
+sklearn
+numpy
+matplotlib
+urllib3
+xmltodict
