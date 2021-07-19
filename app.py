@@ -63,7 +63,7 @@ if len(df) > 0:
     st.write(len(principalDf))
     st.pyplot(fig)
 
-    clustering = DBSCAN(eps=0.1, min_samples=round(len(df) ** 0.25)).fit(
+    clustering = DBSCAN(eps=0.05, min_samples=round(len(df) ** 0.33)).fit(
         list(zip(x, y))
     )
 
@@ -78,7 +78,7 @@ if len(df) > 0:
     df = df[df["label"] != -1]
 
     for name, group in df.groupby("label"):
-        st.markdown(f"topic: {name}")
+        st.markdown(f"topic: {name} amount:{len(group)}")
         text = " ".join(flatten(group.keywords.tolist()))
         wc = WordCloud(width=800, height=400).generate(text)
         st.image(wc.to_array())
