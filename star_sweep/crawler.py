@@ -29,27 +29,30 @@ def getPUID(terms):
 
 
 def getArticle(terms, amount):
-    puids = getPUID(terms)["eSearchResult"]["IdList"]["Id"]
-    request_batch = [puids[i : i + 200] for i in range(0, amount, 200)]
+    try:
+        puids = getPUID(terms)["eSearchResult"]["IdList"]["Id"]
+        request_batch = [puids[i : i + 200] for i in range(0, amount, 200)]
 
-    result = []
-    for i, e in enumerate(request_batch):
-        print(i)
-        result.append(
-            getxml(
-                "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id="
-                + ",".join(e)
-                + "&rettype=text"
+        result = []
+        for i, e in enumerate(request_batch):
+            print(i)
+            result.append(
+                getxml(
+                    "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id="
+                    + ",".join(e)
+                    + "&rettype=text"
+                )
             )
-        )
 
-    out = []
-    for e in result:
-        try:
-            out += e["PubmedArticleSet"]["PubmedArticle"]
-        except:
-            pass
-    return out
+        out = []
+        for e in result:
+            try:
+                out += e["PubmedArticleSet"]["PubmedArticle"]
+            except:
+                pass
+        return out
+    except:
+        return []
 
 
 # print("x")
