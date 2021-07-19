@@ -7,11 +7,12 @@ import matplotlib.pyplot as plt
 from star_sweep.crawler import *
 from star_sweep.analyzer import *
 from collections import Counter
-
+from sklearn.cluster import DBSCAN
+from sklearn.decomposition import PCA
 
 from nltk import flatten
 
-st.title("""Star Sweep version 1.0""")
+st.title("""Star Sweep version 0.1""")
 
 
 search_input = st.sidebar.text_input("Finding Topic")
@@ -30,22 +31,27 @@ st.dataframe(df)
 if len(df) > 0:
     df = df.dropna()
     print("x")
+    df["keywords"] = df["keywords"].apply(lambda x: cleanText(x))
     keywords_count = Counter(flatten(df["keywords"].tolist()))
     most_keywords = [
         key
         for key in keywords_count.keys()
-        if keywords_count[key] > math.round(math.log(len(df), 8))
+        if keywords_count[key] > round(math.log(len(df), 8))
     ]
     mkw2idx = dict(zip(most_keywords, range(len(most_keywords))))
-    df["keywords"] = df["keywords"].apply(lambda x: cleanText(x))
+
     df["cat_features"] = df["keywords"].apply(lambda x: createCatArray(x, mkw2idx))
-    # st.dataframe(df)
+    st.dataframe(df)
 
     pca_components = 2
-
-
-# pca = PCA(n_components=pca_components)
-# principalComponents = pca.fit_transform(X)
-# principalDf = pd.DataFrame(
-#     data=principalComponents, columns=list(range(pca_components))
-# )
+    pca = PCA(n_components=pca_components)
+    principalComponents = pca.fit_transform(df.cat_features.tolist())
+    principalDf = pd.DataFrame(
+        data=principalComponents, columns=list(range(pca_components))
+    )
+    x = principalDf[0]
+    y = principalDf[1]
+    fig, ax = plt.subplots()
+    ax.scatter(x, y)
+    st.dataframe(principalDf)
+    st.pyplot(fig)
