@@ -42,7 +42,7 @@ if len(df) > 0:
     ]
     mkw2idx = dict(zip(most_keywords, range(len(most_keywords))))
     df["cat_features"] = df["keywords"].apply(lambda x: createCatArray(x, mkw2idx))
-    st.dataframe(df)
+    # st.dataframe(df)
 
     pca_components = 2
     pca = PCA(n_components=pca_components)
@@ -59,7 +59,7 @@ if len(df) > 0:
 
     fig, ax = plt.subplots()
     ax.scatter(x, y, marker=".")
-    st.dataframe(principalDf)
+
     st.write(len(principalDf))
     st.pyplot(fig)
 
@@ -68,12 +68,11 @@ if len(df) > 0:
     )
 
     fig2, ax2 = plt.subplots()
-    ax2.scatter(x, y, c=clustering.labels_, marker="*", s=5)
+    ax2.scatter(x, y, c=clustering.labels_, marker=".")
     df["label"] = clustering.labels_
     st.write(len(set(clustering.labels_)))
 
     st.pyplot(fig2)
-    st.dataframe(df)
 
     df = df[df["label"] != -1]
 
