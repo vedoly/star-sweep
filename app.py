@@ -11,6 +11,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import MinMaxScaler
 from nltk import flatten
+from wordcloud import WordCloud
 
 st.title("""Star Sweep version 0.1""")
 
@@ -68,6 +69,16 @@ if len(df) > 0:
 
     fig2, ax2 = plt.subplots()
     ax2.scatter(x, y, c=clustering.labels_, marker="*", s=5)
-    principalDf["label"] = clustering.labels_
+    df["label"] = clustering.labels_
     st.write(len(set(clustering.labels_)))
+
     st.pyplot(fig2)
+    st.dataframe(df)
+
+    df = df[df["label"] != -1]
+
+    for name, group in df.groupby("label"):
+        st.markdown(f"topic: {name}")
+        text = " ".join(flatten(group.keywords.tolist()))
+        wc = WordCloud(width=800, height=400).generate(text)
+        st.image(wc.to_array())
