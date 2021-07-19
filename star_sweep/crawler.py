@@ -1,6 +1,8 @@
 import traceback
 import urllib3
 import xmltodict
+import numpy as np
+import pandas as pd
 from urllib.parse import urlencode, quote
 
 # from urllib.parse import urlencode # python3
@@ -53,6 +55,56 @@ def getArticle(terms, amount):
         return out
     except:
         return []
+
+
+def getDataframe(terms, amount):
+    result = getArticle(terms, amount + 20)[:-20]
+    print(len(result))
+
+    data = {"pmid": [], "title": [], "abstract": [], "keywords": []}
+    for e in result:
+        try:
+            data["pmid"].append(e["MedlineCitation"]["PMID"]["#text"])
+
+        except:
+            data["pmid"].append(np.nan)
+
+        try:
+            data["title"].append(e["MedlineCitation"]["Article"]["ArticleTitle"])
+        except:
+            data["title"].append(np.nan)
+
+        try:
+            try:
+                try:
+                    data["abstract"].append(
+                        e["MedlineCitation"]["Article"]["Abstract"]["AbstractText"][0][
+                            "#text"
+                        ]
+                    )
+
+                except Exception as ee:
+
+                    data["abstract"].append(
+                        e["MedlineCitation"]["Article"]["Abstract"]["AbstractText"][
+                            "#text"
+                        ]
+                    )
+            except:
+                data["abstract"].append(
+                    e["MedlineCitation"]["Article"]["Abstract"]["AbstractText"]
+                )
+        except:
+            data["abstract"].append(np.nan)
+
+        try:
+            data["keywords"].append(
+                [k["#text"] for k in e["MedlineCitation"]["KeywordList"]["Keyword"]]
+            )
+        except:
+            data["keywords"].append(np.nan)
+
+    return pd.DataFrame.from_dict(data)
 
 
 # print("x")
