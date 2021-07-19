@@ -9,7 +9,7 @@ from star_sweep.analyzer import *
 from collections import Counter
 from sklearn.cluster import DBSCAN
 from sklearn.decomposition import PCA
-
+from sklearn.preprocessing import MinMaxScaler
 from nltk import flatten
 
 st.title("""Star Sweep version 0.1""")
@@ -29,6 +29,7 @@ st.write(len(df))
 st.dataframe(df)
 # print(result)
 if len(df) > 0:
+
     df = df.dropna()
     print("x")
     df["keywords"] = df["keywords"].apply(lambda x: cleanText(x))
@@ -39,7 +40,6 @@ if len(df) > 0:
         if keywords_count[key] > round(math.log(len(df), 8))
     ]
     mkw2idx = dict(zip(most_keywords, range(len(most_keywords))))
-
     df["cat_features"] = df["keywords"].apply(lambda x: createCatArray(x, mkw2idx))
     st.dataframe(df)
 
@@ -49,9 +49,25 @@ if len(df) > 0:
     principalDf = pd.DataFrame(
         data=principalComponents, columns=list(range(pca_components))
     )
-    x = principalDf[0]
-    y = principalDf[1]
+
+    # data_points = [(e[0], e[1]) for e in principalDf]
+    x = np.array(principalDf[0].tolist())
+    x = (x - x.min()) / (x.max() - x.min())
+    y = np.array(principalDf[1].tolist())
+    y = (y - y.min()) / (y.max() - y.min())
+
     fig, ax = plt.subplots()
-    ax.scatter(x, y)
+    ax.scatter(x, y, marker=".")
     st.dataframe(principalDf)
+    st.write(len(principalDf))
     st.pyplot(fig)
+
+    clustering = DBSCAN(eps=0.1, min_samples=round(len(df) ** 0.25)).fit(
+        list(zip(x, y))
+    )
+
+    fig2, ax2 = plt.subplots()
+    ax2.scatter(x, y, c=clustering.labels_, marker="*", s=5)
+    principalDf["label"] = clustering.labels_
+    st.write(len(set(clustering.labels_)))
+    st.pyplot(fig2)
