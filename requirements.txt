@@ -4,3 +4,4 @@ numpy
 matplotlib
 urllib3
 xmltodict
+nltk
